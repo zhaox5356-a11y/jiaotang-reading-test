@@ -1223,14 +1223,28 @@ function init() {
             // 使用 mailto 打开邮箱
             const mailtoUrl = 'mailto:zhaox5356@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
             
-            // 延迟一点显示成功，让用户有时间看到邮箱打开
-            setTimeout(function() {
+            // 尝试多种方式打开邮箱
+            try {
+                // 方式1: 直接跳转（桌面端常用）
                 window.location.href = mailtoUrl;
+            } catch(e) {}
+            
+            // 方式2: 尝试打开新窗口（部分移动端有效）
+            setTimeout(function() {
+                try {
+                    var mailWindow = window.open(mailtoUrl, '_blank');
+                    if (!mailWindow || mailWindow.closed || typeof mailWindow.closed === 'undefined') {
+                        // 方式3: 弹出提示框
+                        alert('请打开邮箱发送邮件\n\n收件人：zhaox5356@gmail.com\n主题：' + subject);
+                    }
+                } catch(e) {
+                    // 备用方案：显示邮件内容让用户复制
+                }
                 
                 // 显示成功页面
                 document.getElementById('signupForm').style.display = 'none';
                 document.getElementById('signupSuccess').style.display = 'block';
-            }, 500);
+            }, 800);
         }
         
         // 监听输入
