@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🍬 焦糖中文阅读能力测评系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFF0F5 100%);
+            min-height: 100vh;
+            padding: 12px;
+            padding-bottom: 60px;
+        }
+        
+        .container { max-width: 480px; margin: 0 auto; }
+        
+        /* 头部 */
+        .header {
+            text-align: center;
+            padding: 12px 0;
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(208,19,87,0.08);
+        }
+        
+        .header h1 {
+            color: #D01357;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .header p { color: #888; font-size: 12px; }
+        
+        /* 进度条 */
+        .progress-bar {
+            display: flex;
+            gap: 4px;
+            padding: 12px 0;
+        }
+        
+        .progress-step {
+            flex: 1;
+            height: 6px;
+            background: #E0E0E0;
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-step.active { background: #D01357; }
+        .progress-step.completed { background: #4CAF50; }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+        
+        .progress-label span.active { color: #D01357; font-weight: bold; }
+        
+        /* 卡片 */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(208,19,87,0.06);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed #FFE4E4;
+        }
+        
+        .card-header h2 {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .type-badge {
+            padding: 4px 10px;
+            background: #FFF5F5;
+            color: #D01357;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        /* 表单 */
+        .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
+        
+        .form-group { flex: 1; }
+        
+        .form-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 6px;
+            display: block;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #F0F0F0;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #D01357;
+        }
+        
+        /* 识字测试 */
+        .char-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+        }
+        
+        .char-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            background: #FFF5F5;
+            border: 2px solid #FFE4E4;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .char-item.selected {
+            background: #D01357;
+            color: white;
+            border-color: #D01357;
+        }
+        
+        .char-item.not-know {
+            background: #F5F5F5;
+            color: #CCC;
+            border-color: #E0E0E0;
+        }
+        
+        /* 进度统计 */
+        .stat-row {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #FAFAFA;
+            border-radius: 10px;
+            margin: 12px 0;
+        }
+        
+        .stat-item { text-align: center; }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #D01357;
+        }
+        
+        .stat-label { font-size: 11px; color: #999; }
+        
+        /* 短文阅读 */
+        .reading-passage {
+            background: #FFF8F8;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            line-height: 2;
+            color: #333;
+            margin-bottom: 14px;
+            position relative;
+        }
+        
+        .passage-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #D01357;
+            margin-bottom: 8px;
+        }
+        
+        /* 题目 */
+        .question {
+            margin-bottom: 14px;
+            padding: 12px;
+            background: #FAFAFA;
+            border-radius: 10px;
+        }
+        
+        .question-title {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .option-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #EEE;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .option-btn:last-child { margin-bottom: 0; }
+        
+        .option-btn.selected {
+            border-color: #D01357;
+            background: #FFF5F5;
+            color: #D01357;
+        }
+        
+        .option-btn.correct {
+            border-color: #4CAF50;
+            background: #E8F5E9;
+        }
+        
+        .option-letter {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #F0F0F0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .option-btn.selected .option-letter {
+            background: #D01357;
+            color: white;
+        }
+        
+        /* 组词 */
+        .word-question {
+            margin-bottom: 12px;
+        }
+        
+        .char-highlight {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #D01357;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 0 2px;
+        }
+        
+        /* 按钮 */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #D01357 0%, #E91E63 100%);
+            color: white;
+        }
+        
+        .btn-primary:disabled {
+            background: #CCC;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(208,19,87,0.3);
+        }
+        
+        /* 结果页 */
+        .result-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .result-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #D01357, #E91E63);
+            margin: 0 auto 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        .result-name { font-size: 22px; color: #333; margin-bottom: 4px; }
+        .result-age { font-size: 13px; color: #999; }
+        
+        /* 等级卡片 */
+        .level-card {
+            background: linear-gradient(135deg, #FFF5F5, #FFF0F5);
+            border: 2px solid #FFD4E0;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin: 16px 0;
+        }
+        
+        .level-badge {
+            display: inline-block;
+            padding: 10px 30px;
+            background: linear-gradient(135deg, #D01357, #E91E63);
+            color: white;
+            border-radius: 25px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .level-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* 五维雷达图 */
+        .radar-section {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 14px 0;
+        }
+        
+        .radar-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .radar-dimension {
+            margin-bottom: 12px;
+        }
+        
+        .dimension-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .dimension-name { font-size: 13px; color: #666; }
+        .dimension-score { font-size: 14px; font-weight: bold; }
+        
+        .dimension-bar {
+            height: 8px;
+            background: #F0F0F0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .dimension-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #D01357, #E91E63);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        /* 详细分析 */
+        .analysis-section {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 14px 0;
+        }
+        
+        .analysis-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #F5F5F5;
+        }
+        
+        .analysis-item:last-child { border-bottom: none; }
+        
+        .analysis-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .analysis-text { font-size: 13px; color: #666; line-height: 1.6; }
+        
+        /* 书单 */
+        .book-section {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 14px 0;
+        }
+        
+        .book-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #F5F5F5;
+        }
+        
+        .book-item:last-child { border-bottom: none; }
+        
+        .book-cover {
+            width: 45px;
+            height: 60px;
+            background: linear-gradient(135deg, #FFE4E4, #FFF5F5);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        
+        .book-name { font-size: 14px; color: #333; font-weight: 500; margin-bottom: 2px; }
+        .book-desc { font-size: 12px; color: #999; }
+        
+        .book-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #FFF5F5;
+            color: #D01357;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-right: 4px;
+        }
+        
+        /* CTA */
+        .cta-section {
+            background: linear-gradient(135deg, #D01357, #E91E63);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            margin: 14px 0;
+        }
+        
+        .cta-title { color: white; font-size: 16px; font-weight: bold; margin-bottom: 6px; }
+        .cta-desc { color: rgba(255,255,255,0.8); font-size: 13px; margin-bottom: 12px; }
+        
+        .cta-btn {
+            background: white;
+            color: #D01357;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        
+        /* 隐藏 */
+        .hidden { display: none; }
+        
+        /* 完成页 */
+        .complete-icon {
+            font-size: 60px;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 步骤1：基本信息 -->
+        <div id="page1">
+            <div class="header">
+                <h1>🍬 焦糖中文阅读能力测评</h1>
+                <p>专业评估孩子的阅读发展水平</p>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+            </div>
+            <div class="progress-label">
+                <span>基本信息</span>
+                <span>识字量</span>
+                <span>理解力</span>
+                <span>表达力</span>
+                <span>结果</span>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="type-badge">STEP 1</span>
+                    <h2>👤 基本信息</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">孩子姓名</label>
+                    <input type="text" class="form-input" id="childName" placeholder="请输入孩子姓名">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">年龄</label>
+                        <select class="form-select" id="childAge">
+                            <option value="">选择年龄</option>
+                            <option value="4">4岁</option>
+                            <option value="5">5岁</option>
+                            <option value="6">6岁</option>
+                            <option value="7">7岁</option>
+                            <option value="8">8岁</option>
+                            <option value="9">9岁</option>
+                            <option value="10">10岁</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">年级</label>
+                        <select class="form-select" id="childGrade">
+                            <option value="">选择年级</option>
+                            <option value="幼儿园">幼儿园</option>
+                            <option value="大班">大班</option>
+                            <option value="学前班">学前班</option>
+                            <option value="一年级">一年级</option>
+                            <option value="二年级">二年级</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="goPage(2)" id="page1Btn" disabled>开始测评 →</button>
+            </div>
+        </div>
+        
+        <!-- 步骤2：识字量测试 -->
+        <div id="page2" class="hidden">
+            <div class="header">
+                <h1>🔤 识字量测试</h1>
+                <p>请点击孩子认识的汉字</p>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-step completed"></div>
+                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="type-badge">STEP 2</span>
+                    <h2>📝 基础识字（20字）</h2>
+                </div>
+                
+                <div class="stat-row">
+                    <div class="stat-item">
+                        <div class="stat-value" id="knownCount">0</div>
+                        <div class="stat-label">认识</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalCount">60</div>
+                        <div class="stat-label">总字数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="charPercent">0%</div>
+                        <div class="stat-label">掌握率</div>
+                    </div>
+                </div>
+                
+                <div class="type-badge" style="margin-bottom: 10px;">初级词汇</div>
+                <div class="char-grid" id="charGrid1"></div>
+                
+                <div class="type-badge" style="margin-top: 14px; margin-bottom: 10px;">中级词汇</div>
+                <div class="char-grid" id="charGrid2"></div>
+                
+                <div class="type-badge" style="margin-top: 14px; margin-bottom: 10px;">高级词汇</div>
+                <div class="char-grid" id="charGrid3"></div>
+                
+                <button class="btn btn-primary" onclick="goPage(3)" id="page2Btn" disabled>下一步：阅读理解 →</button>
+            </div>
+        </div>
+        
+        <!-- 步骤3：阅读理解 -->
+        <div id="page3" class="hidden">
+            <div class="header">
+                <h1>📖 阅读理解测试</h1>
+                <p>请选择正确答案</p>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-step completed"></div>
+                <div class="progress-step completed"></div>
+                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+            </div>
+            
+            <div class="card" id="readingCard"></div>
+            
+            <button class="btn btn-primary" onclick="goPage(4)" id="page3Btn" disabled>下一步：表达力测试 →</button>
+        </div>
+        
+        <!-- 步骤4：表达力测试 -->
+        <div id="page4" class="hidden">
+            <div class="header">
+                <h1>✏️ 表达力测试</h1>
+                <p>字词理解 + 句式运用</p>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-step completed"></div>
+                <div class="progress-step completed"></div>
+                <div class="progress-step completed"></div>
+                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+            </div>
+            
+            <div class="card" id="exprCard"></div>
+            
+            <button class="btn btn-primary" onclick="showResult()" id="page4Btn" disabled>查看测评结果</button>
+        </div>
+        
+        <!-- 步骤5：结果 -->
+        <div id="page5" class="hidden">
+            <div class="complete-icon">🎉</div>
+            
+            <div class="result-header">
+                <div class="result-avatar">👧</div>
+                <div class="result-name" id="resName">小明</div>
+                <div class="result-age" id="resAge">5岁 · 大班</div>
+            </div>
+            
+            <!-- 等级 -->
+            <div class="level-card">
+                <div class="level-badge" id="resLevel">中级阅读者</div>
+                <div class="level-desc" id="resDesc">阅读基础扎实，可以开始系统提升</div>
+            </div>
+            
+            <!-- 五维能力 -->
+            <div class="radar-section">
+                <div class="radar-title">📊 五维能力分析</div>
+                <div class="radar-dimension">
+                    <div class="dimension-header">
+                        <span class="dimension-name">👶 识字量</span>
+                        <span class="dimension-score" id="d1">85分</span>
+                    </div>
+                    <div class="dimension-bar">
+                        <div class="dimension-fill" id="b1" style="width: 85%"></div>
+                    </div>
+                </div>
+                <div class="radar-dimension">
+                    <div class="dimension-header">
+                        <span class="dimension-name">📖 理解力</span>
+                        <span class="dimension-score" id="d2">70分</span>
+                    </div>
+                    <div class="dimension-bar">
+                        <div class="dimension-fill" id="b2" style="width: 70%"></div>
+                    </div>
+                </div>
+                <div class="radar-dimension">
+                    <div class="dimension-header">
+                        <span class="dimension-name">🔤 词汇量</span>
+                        <span class="dimension-score" id="d3">65分</span>
+                    </div>
+                    <div class="dimension-bar">
+                        <div class="dimension-fill" id="b3" style="width: 65%"></div>
+                    </div>
+                </div>
+                <div class="radar-dimension">
+                    <div class="dimension-header">
+                        <span class="dimension-name">✏️ 表达力</span>
+                        <span class="dimension-score" id="d4">60分</span>
+                    </div>
+                    <div class="dimension-bar">
+                        <div class="dimension-fill" id="b4" style="width: 60%"></div>
+                    </div>
+                </div>
+                <div class="radar-dimension">
+                    <div class="dimension-header">
+                        <span class="dimension-name">🧠 阅读策略</span>
+                        <span class="dimension-score" id="d5">55分</span>
+                    </div>
+                    <div class="dimension-bar">
+                        <div class="dimension-fill" id="b5" style="width: 55%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 详细分析 -->
+            <div class="analysis-section">
+                <div class="radar-title">💡 详细分析与建议</div>
+                <div id="analysisContent"></div>
+            </div>
+            
+            <!-- 推荐书单 -->
+            <div class="book-section">
+                <div class="radar-title">📚 推荐阅读书单（28天计划）</div>
+                <div id="bookContent"></div>
+            </div>
+            
+            <!-- 报名入口 -->
+            <div id="signupSection"></div>
+            
+            <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 12px;">🔄 重新测评</button>
+        </div>
+    </div>
+    
+    <script>
+        // ===== 数据 =====
+        
+        // 识字字库（60字，3级）
+        const charLevel1 = ['一','二','三','上','下','大','小','人','口','日','月','水','火','天','地','山','石','木','竹','田'];
+        const charLevel2 = ['学','校','书','笔','本','纸','课','业','生','师','友','爸','妈','爷','奶','哥','姐','弟','妹','名'];
+        const charLevel3 = ['读','写','字','文','语','言','句','词','题','思','考','习','惯','爱','心','情','理','道','知','识'];
+        
+        // 阅读理解（每级1篇，每篇5题）
+        const readingTests = [
+            {
+                title: '🐰 可爱的小兔子',
+                level: 1,
+                text: '小红有一只小兔子。小兔子很可爱。它有长长的耳朵，红红的眼睛。小红每天都和小兔子一起玩。小兔子喜欢吃胡萝卜。小红带它去公园晒太阳。',
+                questions: [
+                    { q: '小兔子有什么颜色的眼睛？', opts: ['蓝蓝的', '红红的', '黑黑的'], a: 1 },
+                    { q: '小兔子喜欢吃什么？', opts: ['白菜', '胡萝卜', '苹果'], a: 1 },
+                    { q: '小红带小兔子去哪里？', opts: ['学校', '公园', '超市'], a: 1 },
+                    { q: '小兔子的耳朵是什么样的？', opts: ['短短的', '长长的', '小小的'], a: 1 },
+                    { q: '小兔子是小红的什么？', opts: ['朋友', '宠物', '玩具'], a: 1 }
+                ]
+            },
+            {
+                title: '🌸 美丽的春天',
+                level: 2,
+                text: '春天来了，天气变暖和了。小鸟从南方飞回来了。树上长出了绿绿的叶子。花园里开满了五颜六色的花。小朋友们脱掉了厚厚的冬衣。他们在公园里开心地玩耍。春天真是一个美丽的季节。',
+                questions: [
+                    { q: '小鸟从什么地方飞回来了？', opts: ['北方', '南方', '西方'], a: 1 },
+                    { q: '树上长出了什么？', opts: ['花朵', '绿叶', '果实'], a: 1 },
+                    { q: '花园里有什么？', opts: ['蔬菜', '五颜六色的花', '树木'], a: 1 },
+                    { q: '小朋友们在做什么？', opts: ['睡觉', '玩耍', '吃饭'], a: 1 },
+                    { q: '关于春天，哪个说法不对？', opts: ['天气变冷', '天气变暖', '树叶变绿'], a: 0 }
+                ]
+            },
+            {
+                title: '📚 爱读书的小明',
+                level: 3,
+                text: '小明是一个爱读书的孩子。他每天都坚持读书一小时。通过读书，他学到了很多知识。他明白了做人的道理。有一天，他在书里读到了一个关于坚持的故事。故事讲的是一个小男孩通过坚持不懈的努力，最后成功地完成了任务。小明被深深地感动了。从那以后，小明更加努力了。',
+                questions: [
+                    { q: '小明每天读书多长时间？', opts: ['半小时', '一小时', '两小时'], a: 1 },
+                    { q: '小男孩是怎么完成任务的？', opts: ['别人帮忙', '坚持不懈', '运气好'], a: 1 },
+                    { q: '小明读完故事后决定怎么做？', opts: ['不再读书', '更加努力', '把书扔掉'], a: 1 },
+                    { q: '读书让小明明白了什么？', opts: ['游戏的道理', '做人的道理', '吃饭的道理'], a: 1 },
+                    { q: '故事告诉我们什么道理？', opts: ['要放弃', '要坚持', '要偷懒'], a: 1 }
+                ]
+            }
+        ];
+        
+        // 组词测试 - 改成只有一个正确答案
+        const wordTests = [
+            { char: '大', level: 1, words: ['大人', '小米', '红色'], answer: 0 },
+            { char: '小', level: 1, words: ['小心', '大树', '黑色'], answer: 0 },
+            { char: '日', level: 1, words: ['日出', '月亮', '星星'], answer: 0 },
+            { char: '学', level: 2, words: ['学生', '教室', '黑板'], answer: 0 },
+            { char: '书', level: 2, words: ['读书', '铅笔', '橡皮'], answer: 0 },
+            { char: '读', level: 3, words: ['朗读', '写字', '画画'], answer: 0 }
+        ];
+        
+        // 推荐书单
+        const bookData = {
+            1: [
+                { name: '猜猜我有多爱你', icon: '🐰', desc: '大兔子和小兔子的温情故事' },
+                { name: '逃家小兔', icon: '🐇', desc: '兔妈妈永远追得上小兔子' },
+                { name: '好饿的毛毛虫', icon: '🐛', desc: '毛毛虫吃啊吃变成蝴蝶' },
+                { name: '棕色的熊', icon: '🐻', desc: '认识颜色和动物的英文绘本' },
+                { name: '小蓝和小黄', icon: '💙', desc: '颜色混合的奇妙故事' }
+            ],
+            2: [
+                { name: '爷爷一定有办法', icon: '👴', desc: '旧毯子变成外套的智慧' },
+                { name: '花婆婆', icon: '🌸', desc: '让世界变得更美丽的事' },
+                { name: '勇气', icon: '🦁', desc: '什么是勇气的小故事' },
+                { name: '大卫不可以', icon: '👦', desc: '调皮大卫的成长故事' },
+                { name: '我爸爸', icon: '👨', desc: '我爸爸真的很棒' }
+            ],
+            3: [
+                { name: '窗边的小豆豆', icon: '📖', desc: '小豆豆的校园成长日记' },
+                { name: '夏洛的网', icon: '🕷️', desc: '蜘蛛和小猪的友情故事' },
+                { name: '小王子', icon: '⭐', desc: '来自星星王子的哲理故事' },
+                { name: '草房子', icon: '🏠', desc: '乡村孩子的成长故事' },
+                { name: '时代广场的蟋蟀', icon: '🦗', desc: '音乐与友情的奇妙故事' }
+            ]
+        };
+        
+        // 阅读建议
+        const adviceData = {
+            1: [
+                { title: '🌱 培养阅读兴趣', desc: '选择图文并茂、故事性强的绘本，每天亲子共读15-20分钟。' },
+                { title: '🏠 在生活中认字', desc: '在路牌、广告牌、超市标签等处指认汉字，增强识字的实用性。' },
+                { title: '🗣️ 鼓励复述故事', desc: '阅读后鼓励孩子用自己的话复述故事，锻炼语言表达能力。' }
+            ],
+            2: [
+                { title: '📈 提升理解深度', desc: '引导孩子思考"为什么"，不只关注"是什么"，培养深度理解能力。' },
+                { title: '📚 扩大词汇量', desc: '阅读后讨论新词语，尝试在日常生活中运用。' },
+                { title: '⏰ 固定阅读时间', desc: '养成每天固定时间的阅读习惯，如睡前阅读。' }
+            ],
+            3: [
+                { title: '✍️ 培养写作习惯', desc: '鼓励写读后感，用文字表达自己的想法和感受。' },
+                { title: '📖 拓展阅读类型', desc: '引入科普、历史、文学等不同类型的书籍。' },
+                { title: '💭 培养批判思维', desc: '引导分析人物性格、情节设置，培养独立思考能力。' }
+            ]
+        };
+        
+        // ===== 状态 =====
+        let childName = '', childAge = '', childGrade = '';
+        let knownChars = new Set();
+        let readingAnswers = {};
+        let wordAnswers = {};
+        
+        // 分数
+        let scores = { char: 0, read: 0, vocab: 0, expr: 0, strategy: 0 };
+        
+        // ===== 初始化 =====
+        
+function init() {
+            renderCharGrids();
+            checkPage1();
+        }
+        
+        function renderCharGrids() {
+            const allChars = [...charLevel1, ...charLevel2, ...charLevel3];
+            document.getElementById('charGrid1').innerHTML = charLevel1.map((c, i) => 
+                `<div class="char-item" onclick="toggleChar(${i}, 1)">${c}</div>`).join('');
+            document.getElementById('charGrid2').innerHTML = charLevel2.map((c, i) => 
+                `<div class="char-item" onclick="toggleChar(${i}, 2)">${c}</div>`).join('');
+            document.getElementById('charGrid3').innerHTML = charLevel3.map((c, i) => 
+                `<div class="char-item" onclick="toggleChar(${i}, 3)">${c}</div>`).join('');
+        }
+        
+        function toggleChar(index, level) {
+            let grid, chars;
+            if (level === 1) { grid = 1; chars = charLevel1; }
+            else if (level === 2) { grid = 2; chars = charLevel2; }
+            else { grid = 3; chars = charLevel3; }
+            
+            const key = `${level}-${index}`;
+            const items = document.querySelectorAll(`#charGrid${grid} .char-item`);
+            
+            if (knownChars.has(key)) {
+                knownChars.delete(key);
+                items[index].classList.remove('selected');
+            } else {
+                knownChars.add(key);
+                items[index].classList.add('selected');
+            }
+            
+            updateCharStats();
+        }
+        
+        function updateCharStats() {
+            document.getElementById('knownCount').textContent = knownChars.size;
+            document.getElementById('charPercent').textContent = Math.round(knownChars.size / 60 * 100) + '%';
+            document.getElementById('page2Btn').disabled = knownChars.size === 0;
+        }
+        
+        function checkPage1() {
+            const name = document.getElementById('childName').value.trim();
+            const age = document.getElementById('childAge').value;
+            const grade = document.getElementById('childGrade').value;
+            document.getElementById('page1Btn').disabled = !name || !age || !grade;
+        }
+        
+        function goPage(page) {
+            if (page === 2) {
+                childName = document.getElementById('childName').value.trim();
+                childAge = document.getElementById('childAge').value;
+                childGrade = document.getElementById('childGrade').value;
+            }
+            
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`page${i}`).classList.toggle('hidden', i !== page);
+            }
+            
+            if (page === 3) renderReadingTest();
+            if (page === 4) renderExprTest();
+        }
+        
+        function renderReadingTest() {
+            // 根据识字量选择测试难度
+            let level = 1;
+            if (knownChars.size >= 30) level = 3;
+            else if (knownChars.size >= 15) level = 2;
+            
+            const test = readingTests.find(t => t.level === level);
+            
+            let html = `
+                <div class="card-header">
+                    <span class="type-badge">STEP 3</span>
+                    <h2>📖 ${test.title}</h2>
+                </div>
+                
+                <div class="reading-passage">${test.text}</div>
+                
+                <div class="type-badge" style="margin-bottom: 12px;">理解力测试（5题）</div>
+            `;
+            
+            test.questions.forEach((q, i) => {
+                html += `
+                    <div class="question">
+                        <div class="question-title">${i + 1}. ${q.q}</div>
+                        ${q.opts.map((opt, j) => `
+                            <button class="option-btn" onclick="selectReading(${i}, ${j}, this, ${q.a})">
+                                <span class="option-letter">${String.fromCharCode(65 + j)}</span>
+                                <span>${opt}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('readingCard').innerHTML = html;
+        }
+        
+        function selectReading(index, opt, btn, correct) {
+            const question = btn.closest('.question');
+            question.querySelectorAll('.option-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.querySelector('.option-letter').style.background = '#F0F0F0';
+            });
+            btn.classList.add('selected');
+            btn.querySelector('.option-letter').style.background = '#D01357';
+            
+            readingAnswers[index] = opt;
+            checkPage3();
+        }
+        
+        function checkPage3() {
+            document.getElementById('page3Btn').disabled = Object.keys(readingAnswers).length < 5;
+        }
+        
+        function renderExprTest() {
+            // 根据识字量选择测试难度
+            let level = 1;
+            if (knownChars.size >= 30) level = 3;
+            else if (knownChars.size >= 15) level = 2;
+            
+            const tests = wordTests.filter(t => t.level <= level);
+            
+            let html = `
+                <div class="card-header">
+                    <span class="type-badge">STEP 4</span>
+                    <h2>✏️ 组词练习</h2>
+                </div>
+                
+                <div class="type-badge" style="margin-bottom: 12px;">选择正确的词语</div>
+            `;
+            
+            tests.forEach((t, i) => {
+                html += `
+                    <div class="question">
+                        <div class="question-title">${i + 1}. "<span class="char-highlight">${t.char}</span>" 字可以组成：</div>
+                        ${t.words.map((opt, j) => `
+                            <button class="option-btn" onclick="selectWord(${i}, ${j}, this)">
+                                <span class="option-letter">${String.fromCharCode(65 + j)}</span>
+                                <span>${opt}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            });
+            
+            // 添加造句
+            html += `
+                <div class="type-badge" style="margin-top: 16px; margin-bottom: 12px;">📝 造句练习</div>
+                <div class="question">
+                    <div class="question-title">用 "因为...所以..." 造句：</div>
+                    <div class="question-title" style="font-size: 13px; color: #999; font-weight: normal;">
+                        例如：因为我认真学习，所以取得了好成绩。
+                    </div>
+                    <textarea class="form-input" id="sentenceInput" rows="2" placeholder="请孩子口述，家长帮忙记录..." style="margin-top: 8px; resize: none;"></textarea>
+                </div>
+            `;
+            
+            document.getElementById('exprCard').innerHTML = html;
+            
+            document.getElementById('sentenceInput')?.addEventListener('input', function() {
+                wordAnswers['sentence'] = this.value.trim();
+                checkPage4();
+            });
+        }
+        
+        function selectWord(index, opt, btn) {
+            const question = btn.closest('.question');
+            question.querySelectorAll('.option-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.querySelector('.option-letter').style.background = '#F0F0F0';
+            });
+            btn.classList.add('selected');
+            btn.querySelector('.option-letter').style.background = '#D01357';
+            
+            wordAnswers[index] = opt;
+            checkPage4();
+        }
+        
+        function checkPage4() {
+            // 简化为至少完成1道题就可以看结果
+            const hasAnswer = Object.keys(wordAnswers).length >= 1;
+            document.getElementById('page4Btn').disabled = !hasAnswer;
+        }
+        
+        function showResult() {
+            // 计算分数
+            const totalChars = 60;
+            const knownCount = knownChars.size;
+            
+            // 识字量分数
+            scores.char = Math.round(knownCount / totalChars * 100);
+            
+            // 阅读理解分数
+            let level = knownCount >= 30 ? 3 : (knownCount >= 15 ? 2 : 1);
+            const readingTest = readingTests.find(t => t.level === level);
+            let correctRead = 0;
+            Object.keys(readingAnswers).forEach(key => {
+                if (readingAnswers[key] === readingTest.questions[key].a) correctRead++;
+            });
+            scores.read = Math.round(correctRead / 5 * 100);
+            
+            // 组词分数
+            const wordTests2 = wordTests.filter(t => t.level <= level);
+            let correctWords = 0;
+            Object.keys(wordAnswers).forEach(key => {
+                if (key !== 'sentence' && wordAnswers[key] === wordTests2[key].answer) correctWords++;
+            });
+            scores.vocab = Math.round(correctWords / wordTests2.length * 100);
+            
+            // 表达力分数（组词+造句）
+            scores.expr = Math.round((scores.vocab * 0.7 + (wordAnswers.sentence?.length > 10 ? 30 : 0)) * 100);
+            scores.expr = Math.min(100, scores.expr);
+            
+            // 阅读策略分数（根据综合表现）
+            scores.strategy = Math.round((scores.char + scores.read) / 2 * 0.8);
+            
+            // 确定等级
+            const avg = (scores.char + scores.read + scores.vocab + scores.expr + scores.strategy) / 5;
+            let grade, gradeText, gradeDesc;
+            
+            if (avg >= 75) {
+                grade = 3;
+                gradeText = '高级阅读者';
+                gradeDesc = '阅读能力出色，具备较强的独立阅读能力，可以尝试整本书阅读';
+            } else if (avg >= 55) {
+                grade = 2;
+                gradeText = '中级阅读者';
+                gradeDesc = '阅读基础扎实，可以系统提升，开始培养自主阅读习惯';
+            } else {
+                grade = 1;
+                gradeText = '初级阅读者';
+                gradeDesc = '处于阅读启蒙阶段，需要加强识字和理解训练';
+            }
+            
+            // 更新UI
+            document.getElementById('resName').textContent = childName;
+            document.getElementById('resAge').textContent = childAge + '岁 · ' + childGrade;
+            document.getElementById('resLevel').textContent = gradeText;
+            document.getElementById('resDesc').textContent = gradeDesc;
+            
+            document.getElementById('d1').textContent = scores.char + '分';
+            document.getElementById('b1').style.width = scores.char + '%';
+            document.getElementById('d2').textContent = scores.read + '分';
+            document.getElementById('b2').style.width = scores.read + '%';
+            document.getElementById('d3').textContent = scores.vocab + '分';
+            document.getElementById('b3').style.width = scores.vocab + '%';
+            document.getElementById('d4').textContent = scores.expr + '分';
+            document.getElementById('b4').style.width = scores.expr + '%';
+            document.getElementById('d5').textContent = scores.strategy + '分';
+            document.getElementById('b5').style.width = scores.strategy + '%';
+            
+            // 建议
+            const advice = adviceData[grade];
+            document.getElementById('analysisContent').innerHTML = advice.map(a => `
+                <div class="analysis-item">
+                    <div class="analysis-title">${a.title}</div>
+                    <div class="analysis-text">${a.desc}</div>
+                </div>
+            `).join('');
+            
+            // 报名入口（根据等级定制）
+            // 书单
+            renderSignup(grade);
+            
+            // 显示结果页
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`page${i}`).classList.add('hidden');
+            }
+            document.getElementById('page5').classList.remove('hidden');
+        }
+        
+        function renderSignup(grade) {
+            // 书单
+            const books = bookData[grade];
+            var bookHtml = '';
+            books.forEach(function(b) {
+                bookHtml += '<div class="book-item">';
+                bookHtml += '<div class="book-cover">' + b.icon + '</div>';
+                bookHtml += '<div><div class="book-name">📖 ' + b.name + '</div>';
+                bookHtml += '<div class="book-desc">' + b.desc + '</div></div></div>';
+            });
+            document.getElementById('bookContent').innerHTML = bookHtml;
+
+            // 报名套餐数据
+            var signupData = {
+                1: { tag: '🌱 初级推荐', title: '焦糖28天绘本启蒙营', desc: '专为阅读启蒙阶段设计，从认字到爱上阅读', features: ['每天15分钟亲子共读', '28本精选启蒙绘本', '识字量专项训练', '1v1阅读规划指导'], urgency: '🔥 本月仅剩 8 个名额' },
+                2: { tag: '📈 中级推荐', title: '焦糖28天绘本提升营', desc: '专为有基础的孩子设计，系统提升阅读理解力', features: ['每天15分钟深度阅读', '28本中级精选绘本', '阅读理解专项训练', '1v1阅读规划指导'], urgency: '🔥 本月仅剩 6 个名额' },
+                3: { tag: '🏆 高级推荐', title: '焦糖28天整本书阅读营', desc: '专为阅读能力强的孩子设计，挑战整本书阅读', features: ['每天20分钟独立阅读', '4本精选章节书', '写作表达专项训练', '1v1阅读规划指导'], urgency: '🔥 本月仅剩 5 个名额' }
+            };
+            var s = signupData[grade];
+
+            // 课程特色列表
+            var featuresHtml = '';
+            s.features.forEach(function(f) {
+                featuresHtml += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;"><span style="color:#FFD700;">✓</span>' + f + '</div>';
+            });
+
+            // 报名入口HTML
+            var html = '<div style="background:linear-gradient(135deg,#D01357,#E91E63);border-radius:16px;padding:20px;margin:14px 0;color:white;">';
+            html += '<div style="font-size:12px;background:rgba(255,255,255,0.2);display:inline-block;padding:3px 10px;border-radius:10px;margin-bottom:10px;">' + s.tag + '</div>';
+            html += '<div style="font-size:18px;font-weight:bold;margin-bottom:6px;">' + s.title + '</div>';
+            html += '<div style="font-size:13px;opacity:0.9;margin-bottom:14px;">' + s.desc + '</div>';
+            html += '<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:12px;margin-bottom:14px;">' + featuresHtml + '</div>';
+            html += '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;">';
+            html += '<span style="font-size:32px;font-weight:bold;">¥99</span>';
+            html += '<span style="font-size:14px;text-decoration:line-through;opacity:0.7;">原价¥199</span>';
+            html += '<span style="background:#FFD700;color:#D01357;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:bold;">立减100元</span></div>';
+            html += '<div style="font-size:12px;opacity:0.8;margin-bottom:14px;">' + s.urgency + '</div>';
+            html += '<button onclick="showSignupForm()" style="width:100%;padding:14px;background:white;color:#D01357;border:none;border-radius:12px;font-size:16px;font-weight:bold;cursor:pointer;">🍬 立即报名，锁定名额</button>';
+            html += '</div>';
+
+            // 报名表单
+            html += '<div id="signupForm" style="display:none;background:white;border-radius:16px;padding:20px;margin-top:12px;box-shadow:0 2px 12px rgba(208,19,87,0.1);">';
+            html += '<div style="font-size:16px;font-weight:bold;color:#333;margin-bottom:14px;">📝 填写报名信息</div>';
+            html += '<div style="margin-bottom:12px;"><label style="font-size:12px;color:#666;display:block;margin-bottom:6px;">家长姓名</label><input type="text" id="parentName" placeholder="请输入家长姓名" style="width:100%;padding:10px 12px;border:2px solid #F0F0F0;border-radius:10px;font-size:14px;"></div>';
+            html += '<div style="margin-bottom:12px;"><label style="font-size:12px;color:#666;display:block;margin-bottom:6px;">联系电话</label><input type="tel" id="parentPhone" placeholder="请输入手机号码" style="width:100%;padding:10px 12px;border:2px solid #F0F0F0;border-radius:10px;font-size:14px;"></div>';
+            html += '<div style="margin-bottom:16px;"><label style="font-size:12px;color:#666;display:block;margin-bottom:6px;">微信号（方便顾问联系）</label><input type="text" id="parentWechat" placeholder="请输入微信号" style="width:100%;padding:10px 12px;border:2px solid #F0F0F0;border-radius:10px;font-size:14px;"></div>';
+            html += '<button onclick="submitSignup()" style="width:100%;padding:14px;background:linear-gradient(135deg,#D01357,#E91E63);color:white;border:none;border-radius:12px;font-size:15px;font-weight:bold;cursor:pointer;">提交报名申请</button>';
+            html += '<div style="text-align:center;font-size:12px;color:#999;margin-top:10px;">提交后，焦糖顾问会在24小时内联系您 🍬</div>';
+            html += '</div>';
+
+            // 提交成功
+            html += '<div id="signupSuccess" style="display:none;background:white;border-radius:16px;padding:24px;margin-top:12px;text-align:center;box-shadow:0 2px 12px rgba(208,19,87,0.1);">';
+            html += '<div style="font-size:50px;margin-bottom:12px;">🎉</div>';
+            html += '<div style="font-size:18px;font-weight:bold;color:#333;margin-bottom:8px;">报名申请已提交！</div>';
+            html += '<div style="font-size:14px;color:#666;margin-bottom:16px;">焦糖顾问会在24小时内通过微信联系您，请保持手机畅通 🍬</div>';
+            html += '<div style="background:#FFF5F5;border-radius:10px;padding:12px;font-size:13px;color:#D01357;">也可以直接添加微信：<strong>jtxzs001</strong></div>';
+            html += '</div>';
+
+            document.getElementById('signupSection').innerHTML = html;
+        }
+
+        function showSignupForm() {
+            document.getElementById('signupForm').style.display = 'block';
+            document.getElementById('signupForm').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function submitSignup(courseName) {
+            const parentName = document.getElementById('parentName').value.trim();
+            const parentPhone = document.getElementById('parentPhone').value.trim();
+            const parentWechat = document.getElementById('parentWechat').value.trim();
+            
+            if (!parentName || !parentPhone) {
+                alert('请填写家长姓名和联系电话');
+                return;
+            }
+            
+            // 显示发送中
+            document.getElementById('signupForm').innerHTML = '<div style="text-align:center;padding:30px;font-size:30px;">📧<div style="margin-top:10px;color:#666;">正在打开邮箱...</div></div>';
+            
+            // 构建邮件内容
+            const levelNames = {1: '初级阅读者', 2: '中级阅读者', 3: '高级阅读者'};
+            const courseNames = {1: '焦糖28天绘本启蒙营', 2: '焦糖28天绘本提升营', 3: '焦糖28天整本书阅读营'};
+            
+            const subject = '【焦糖测评】新学员报名 - ' + childName;
+            const body = '【焦糖中文阅读能力测评】报名通知\n\n' +
+                '👶 孩子姓名：' + childName + '\n' +
+                '🎂 年龄：' + childAge + '岁\n' +
+                '📚 年级：' + childGrade + '\n' +
+                '📊 测评等级：' + (levelNames[grade] || '初级阅读者') + '\n' +
+                '📈 识字量：' + scores.char + '分\n' +
+                '📖 理解力：' + scores.read + '分\n' +
+                '🔤 词汇量：' + scores.vocab + '分\n' +
+                '✏️ 表达力：' + scores.expr + '分\n\n' +
+                '━━━━━━━━━━━━━━━━━━━\n' +
+                '📝 报名信息：\n' +
+                '👤 家长姓名：' + parentName + '\n' +
+                '📱 联系电话：' + parentPhone + '\n' +
+                '💬 微信号：' + (parentWechat || '未填写') + '\n' +
+                '📚 报名课程：' + (courseNames[grade] || '焦糖28天绘本启蒙营') + '\n' +
+                '⏰ 提交时间：' + new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+            
+            // 使用 mailto 打开邮箱
+            const mailtoUrl = 'mailto:zhaox5356@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+            
+            // 延迟一点显示成功，让用户有时间看到邮箱打开
+            setTimeout(function() {
+                window.location.href = mailtoUrl;
+                
+                // 显示成功页面
+                document.getElementById('signupForm').style.display = 'none';
+                document.getElementById('signupSuccess').style.display = 'block';
+            }, 500);
+        }
+        
+        // 监听输入
+        document.getElementById('childName').addEventListener('input', checkPage1);
+        document.getElementById('childAge').addEventListener('change', checkPage1);
+        document.getElementById('childGrade').addEventListener('change', checkPage1);
+        
+        init();
+    </script>
+</body>
+</html>
